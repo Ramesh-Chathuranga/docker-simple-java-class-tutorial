@@ -1,0 +1,5 @@
+services:
+  hello-world-from-docker-hub:
+    image: rameshchathurangarathnayaka/sample_java_ncc_repo:latest
+    container_name: java-hello-world-from-docker-hub
+    pull_policy: always
