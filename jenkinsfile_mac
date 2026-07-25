@@ -1,0 +1,44 @@
+pipeline {
+    agent any
+
+    environment {
+        IMAGE_NAME = "rameshchathurangarathnayaka/sample_java_ncc_repo:${BUILD_NUMBER}"
+    }
+
+    stages {
+        stage('SCM Checkout') {
+            steps {
+                retry(3) {
+                    git branch: 'main',
+                        url: 'https://github.com/Ramesh-Chathuranga/docker-simple-java-class-tutorial.git'
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t ${IMAGE_NAME} .'
+            }
+        }
+
+        stage('Login to Docker Hub') {
+            steps {
+                withCredentials([string(credentialsId: 'docker-hub_token', variable: 'DOCKER_TOKEN')]) {
+                    sh 'echo "$DOCKER_TOKEN" | docker login -u rameshchathurangarathnayaka --password-stdin'
+                }
+            }
+        }
+
+        stage('Push Image') {
+            steps {
+                sh 'docker push ${IMAGE_NAME}'
+            }
+        }
+    }
+
+    post {
+        always {
+            sh 'docker logout'
+        }
+    }
+}
